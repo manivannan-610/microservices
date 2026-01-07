@@ -1,0 +1,50 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: api-gateway
+  security:
+    user:
+      name: "admin"
+      password: "admin@123"
+
+  cloud:
+    gateway:
+      routes:
+        - id: movie-catalog
+          uri: lb://movie-catalog-service
+          predicates:
+            - Path=/catalog/**
+
+        - id: movie-info-service
+          uri: lb://movie-info-service
+          predicates:
+            - Path=/movies/**
+
+        - id: rating-data-service
+          uri: lb://rating-data-service
+          predicates:
+            - Path=/ratingsData/**
+
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
