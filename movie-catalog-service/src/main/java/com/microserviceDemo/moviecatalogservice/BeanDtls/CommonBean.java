@@ -4,6 +4,7 @@ package com.microserviceDemo.moviecatalogservice.BeanDtls;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -64,8 +65,10 @@ public class CommonBean {
 //        return new RestTemplate(requestFactory);
 //    }
 
-//    @Bean(name="restOne")
-//    public RestTemplate restTemplate(){
-//        return new RestTemplate();
-//    }
+    @Bean(name="restOne")
+    public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder){
+        return restTemplateBuilder
+                .basicAuthentication("admin", "admin@123")
+                .build();
+    }
 }

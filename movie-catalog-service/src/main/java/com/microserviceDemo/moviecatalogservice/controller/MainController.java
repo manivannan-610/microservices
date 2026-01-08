@@ -38,6 +38,7 @@ import javax.net.ssl.SSLContext;
 public class MainController {
 
     @Autowired
+    @Qualifier("restOne")
     private RestTemplate restTemplateOne;
 
     @Autowired
@@ -51,7 +52,7 @@ public class MainController {
         try {
         System.out.println("enter into fucntion");
         ResponseEntity<Rating[]> responses =
-                restTemplateOne.getForEntity("http://rating-data-service/ratingsData/" + userId, Rating[].class);
+                restTemplateOne.getForEntity("http://localhost:8081/ratingsData/" + userId, Rating[].class);
         List<Rating> ratingList = Arrays.asList(responses.getBody());
         ratingList.stream().forEach(attr -> {
             System.out.println(attr.getMovieId());
@@ -60,7 +61,7 @@ public class MainController {
         List<CatalogItem> catalogItemLst = new ArrayList<>();
             for (Rating rating : ratingList) {
                 System.out.println("ratingId=" + rating.getMovieId());
-                Movie movie = restTemplateOne.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
+                Movie movie = restTemplateOne.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), Movie.class);
                 if (movie == null) {
                     continue;
                 }
