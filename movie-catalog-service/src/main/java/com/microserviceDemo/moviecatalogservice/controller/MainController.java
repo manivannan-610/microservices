@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.microserviceDemo.moviecatalogservice.Services.Mainservice;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import com.microserviceDemo.moviecatalogservice.models.Movie;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import reactor.core.publisher.Flux;
 
 import javax.net.ssl.SSLContext;
 
@@ -43,41 +45,55 @@ public class MainController {
 
     @Autowired
     private WebClient.Builder webClientBuilder;
-//    @Autowired
-//    SSLContext sslContext;
+
+    @Autowired
+    private Mainservice mainservice;
 
     @GetMapping("{userId}")
-    @Retry(name = "getUsersMovieList", fallbackMethod = "falBackMovieList")
-    public List<CatalogItem> getUsersMovieList(@PathVariable("userId") String userId) throws HttpClientErrorException {
+//    @Retry(name = "getUsersMovieList", fallbackMethod = "falBackMovieList")
+    public Flux<CatalogItem> getUsersMovieList(@PathVariable("userId") String userId) throws HttpClientErrorException {
         try {
-        System.out.println("enter into fucntion");
-        ResponseEntity<Rating[]> responses =
-                restTemplateOne.getForEntity("http://localhost:8081/ratingsData/" + userId, Rating[].class);
-        List<Rating> ratingList = Arrays.asList(responses.getBody());
-        ratingList.stream().forEach(attr -> {
-            System.out.println(attr.getMovieId());
-            System.out.println(attr.getRating());
-        });
-        List<CatalogItem> catalogItemLst = new ArrayList<>();
-            for (Rating rating : ratingList) {
-                System.out.println("ratingId=" + rating.getMovieId());
-                Movie movie = restTemplateOne.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), Movie.class);
-                if (movie == null) {
-                    continue;
-                }
-                CatalogItem catalogItem = new CatalogItem();
-                catalogItem.setTitle(movie.getName());
-                catalogItem.setDescription(movie.getDescription());
-                catalogItem.setRating(rating.getRating());
-                catalogItemLst.add(catalogItem);
-                System.out.println("movieId=" + movie.getName());
-            }
-            return catalogItemLst;
-        }catch (Exception ex){
+            System.out.println("enter into fucntion 1");
+            return mainservice.getDetails(userId);
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
         return null;
     }
+
+//    @GetMapping("{userId}")
+//    @Retry(name = "getUsersMovieList", fallbackMethod = "falBackMovieList")
+//    public List<CatalogItem> getUsersMovieList(@PathVariable("userId") String userId) throws HttpClientErrorException {
+//        try {
+//        System.out.println("enter into fucntion");
+//        ResponseEntity<Rating[]> responses =
+//                restTemplateOne.getForEntity("http://localhost:8081/ratingsData/" + userId, Rating[].class);
+//        List<Rating> ratingList = Arrays.asList(responses.getBody());
+//        ratingList.stream().forEach(attr -> {
+//            System.out.println(attr.getMovieId());
+//            System.out.println(attr.getRating());
+//        });
+//        List<CatalogItem> catalogItemLst = new ArrayList<>();
+//            for (Rating rating : ratingList) {
+//                System.out.println("ratingId=" + rating.getMovieId());
+//                Movie movie = restTemplateOne.getForObject("http://localhost:8081/movies/" + rating.getMovieId(), Movie.class);
+//                if (movie == null) {
+//                    continue;
+//                }
+//                CatalogItem catalogItem = new CatalogItem();
+//                catalogItem.setTitle(movie.getName());
+//                catalogItem.setDescription(movie.getDescription());
+//                catalogItem.setRating(rating.getRating());
+//                catalogItemLst.add(catalogItem);
+//                System.out.println("movieId=" + movie.getName());
+//            }
+//            return catalogItemLst;
+//        }catch (Exception ex){
+//            ex.printStackTrace();
+//        }
+//        return null;
+//    }
+
 
     public List<CatalogItem> falBackMovieList(String userId, Exception ex) {
         return Arrays.asList(new CatalogItem("No Movie", "", 0.0));
