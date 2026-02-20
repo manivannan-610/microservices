@@ -11,7 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 
 @SpringBootApplication
-//@EnableCircuitBreaker
 public class MovieCatalogServiceApplication  {
 
 	public static void main(String[] args) {
