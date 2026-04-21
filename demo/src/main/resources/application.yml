@@ -46,7 +46,29 @@ management:
     web:
       exposure:
         include: "*"
+#promethues for matrics
+  endpoint:
+    prometheus:
+      access: unrestricted
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+#monitoring/tracking
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      type: w3c
+  otlp:
+    tracing:
+      endpoint: http://localhost:4317
+      transport: grpc
 
 logging:
+  file:
+    name: logs/app.log
   level:
     org.springframework.cloud.gateway: DEBUG
+  pattern:
+    level: "%5p [%X{traceId:-},%X{spanId:-}]"

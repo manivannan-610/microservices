@@ -10,6 +10,8 @@ import com.microserviceDemo.moviecatalogservice.Services.Mainservice;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpMethod;
@@ -50,10 +52,13 @@ public class MainController {
     @Autowired
     private Mainservice mainservice;
 
+    private static Logger logger = LoggerFactory.getLogger(MainController.class);
+
     @GetMapping("{userId}")
     @CircuitBreaker(name = "countriesCircuitBreaker", fallbackMethod = "getUsersMovieList")
     public ResponseEntity<Flux<CatalogItem>>  getUsersMovieList(@PathVariable("userId") String userId) throws Exception {
             System.out.println("enter into fucntion 1");
+            logger.info("Entered into Movie catalog service with userId {}", userId);
             return ResponseEntity.status(HttpStatus.SC_OK).body(mainservice.getDetails(userId));
     }
 

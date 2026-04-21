@@ -29,7 +29,7 @@ public class MainServiceClient {
     private ReactiveCircuitBreaker reactiveCircuitBreaker;
 
     public MainServiceClient(WebClient.Builder builder, ReactiveCircuitBreakerFactory<?, ?> circuitBreakerFactory) {
-        this.webClient = builder.baseUrl("http://localhost:8081/").build();
+        this.webClient = builder.build();
         this.webClient1 = builder.baseUrl("https://restcountries.com/").build();
         this.reactiveCircuitBreaker = circuitBreakerFactory.create("dep");
         ;
@@ -49,7 +49,7 @@ public class MainServiceClient {
     @CircuitBreaker(name = "ratingService", fallbackMethod = "fallBackRatings")
     public Flux<Rating> getRatings(String userId) {
         System.out.println("enter into fucntion 2");
-        return webClient.get().uri("/ratingsData/{userId}", userId).headers(header ->
+        return webClient.get().uri("http://rating-data-service/ratingsData/{userId}", userId).headers(header ->
                         header.setBasicAuth("admin", "admin@123"))
                 .retrieve()
 //                .onStatus(HttpStatusCode::isError, response ->
@@ -77,7 +77,7 @@ public class MainServiceClient {
     @CircuitBreaker(name = "movieService", fallbackMethod = "fallBackMovies")
     public Mono<Movie> getMovieById(String movieId) {
         System.out.println("enter into fucntion 3");
-        return webClient.get().uri("/movies/{movieId}", movieId).headers(header ->
+        return webClient.get().uri("http://movie-info-service/movies/{movieId}", movieId).headers(header ->
                         header.setBasicAuth("admin", "admin@123")).retrieve()
 //                .onStatus(HttpStatusCode::isError, response ->
 //                        response.bodyToMono(String.class)
